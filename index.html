@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GeoLab | ห้องทดลองภูมิศาสตร์</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#061219;
+    --panel:#0c202a;
+    --panel2:#102d38;
+    --text:#edf8fa;
+    --muted:#8faab3;
+    --green:#55d6a1;
+    --blue:#42b7e8;
+    --orange:#e59a62;
+    --red:#ff6f61;
+    --border:rgba(255,255,255,.09);
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 15% 0%,rgba(66,183,232,.12),transparent 30%),
+        radial-gradient(circle at 90% 20%,rgba(85,214,161,.10),transparent 30%),
+        var(--bg);
+    color:var(--text);
+    font-family:Arial,"Noto Sans Thai",sans-serif;
+}
+
+button,
+input,
+select{
+    font:inherit;
+}
+
+.header{
+    position:sticky;
+    top:0;
+    z-index:20;
+    padding:20px 6%;
+    background:rgba(6,18,25,.9);
+    backdrop-filter:blur(15px);
+    border-bottom:1px solid var(--border);
+}
+
+.header-inner{
+    max-width:1200px;
+    margin:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:800;
+}
+
+.logo span{
+    color:var(--green);
+}
+
+.subtitle{
+    margin-top:4px;
+    font-size:13px;
+    color:var(--muted);
+}
+
+.status{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    color:var(--green);
+    font-size:13px;
+}
+
+.status-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 12px var(--green);
+}
+
+.container{
+    width:min(1200px,92%);
+    margin:35px auto 60px;
+}
+
+.hero{
+    margin-bottom:28px;
+}
+
+.hero h1{
+    font-size:clamp(32px,6vw,55px);
+    line-height:1.05;
+    margin-bottom:12px;
+}
+
+.hero h1 span{
+    color:var(--green);
+}
+
+.hero p{
+    max-width:720px;
+    color:var(--muted);
+    line-height:1.7;
+}
+
+.modes{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-bottom:20px;
+}
+
+.mode{
+    text-align:left;
+    color:var(--text);
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:20px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.mode:hover{
+    transform:translateY(-3px);
+    border-color:rgba(85,214,161,.45);
+}
+
+.mode.active{
+    border-color:var(--green);
+    background:linear-gradient(145deg,#12352f,#0c202a);
+}
+
+.mode-icon{
+    font-size:30px;
+    margin-bottom:10px;
+}
+
+.mode h3{
+    margin-bottom:7px;
+}
+
+.mode p{
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.5;
+}
+
+.lab{
+    display:grid;
+    grid-template-columns:330px 1fr;
+    gap:18px;
+}
+
+.panel{
+    background:rgba(12,32,42,.95);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:22px;
+}
+
+.panel h2{
+    font-size:19px;
+    margin-bottom:7px;
+}
+
+.panel-description{
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.6;
+    margin-bottom:24px;
+}
+
+.control{
+    margin-bottom:22px;
+}
+
+.control-top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:9px;
+}
+
+.control-name{
+    font-size:14px;
+}
+
+.control-value{
+    color:var(--green);
+    font-weight:bold;
+}
+
+input[type="range"]{
+    width:100%;
+    accent-color:var(--green);
+}
+
+select{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#071720;
+    color:white;
+    outline:none;
+}
+
+.simulate{
+    width:100%;
+    padding:13px;
+    border:0;
+    border-radius:11px;
+    background:var(--green);
+    color:#062018;
+    font-weight:800;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.simulate:hover{
+    filter:brightness(1.08);
+    transform:translateY(-2px);
+}
+
+.reset{
+    width:100%;
+    padding:11px;
+    margin-top:9px;
+    border-radius:11px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--muted);
+    cursor:pointer;
+}
+
+.visual{
+    min-height:620px;
+    display:flex;
+    flex-direction:column;
+}
+
+.visual-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.badge{
+    padding:7px 12px;
+    border-radius:30px;
+    background:rgba(85,214,161,.1);
+    color:var(--green);
+    font-size:12px;
+}
+
+.canvas-box{
+    width:100%;
+    height:400px;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid var(--border);
+    background:#061018;
+    position:relative;
+}
+
+#geoCanvas{
+    display:block;
+    width:100%;
+    height:100%;
+}
+
+.result{
+    margin-top:16px;
+    padding:18px;
+    border-radius:15px;
+    background:#091a23;
+    border:1px solid var(--border);
+}
+
+.result h3{
+    margin-bottom:8px;
+}
+
+.result p{
+    color:#b9cdd2;
+    font-size:14px;
+    line-height:1.7;
+}
+
+.facts{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-top:14px;
+}
+
+.fact{
+    padding:13px;
+    border-radius:12px;
+    background:rgba(255,255,255,.025);
+    border:1px solid var(--border);
+}
+
+.fact strong{
+    display:block;
+    color:var(--green);
+    font-size:11px;
+    margin-bottom:5px;
+}
+
+.fact span{
+    color:var(--muted);
+    font-size:13px;
+}
+
+.footer{
+    text-align:center;
+    margin-top:35px;
+    color:#607b84;
+    font-size:12px;
+}
+
+@media(max-width:850px){
+
+    .modes{
+        grid-template-columns:1fr;
+    }
+
+    .lab{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:550px){
+
+    .status{
+        display:none;
+    }
+
+    .container{
+        width:94%;
+    }
+
+    .panel{
+        padding:17px;
+    }
+
+    .canvas-box{
+        height:330px;
+    }
+
+    .facts{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+
+<div class="header-inner">
+
+<div>
+    <div class="logo">Geo<span>Lab</span> 🌍</div>
+    <div class="subtitle">Interactive Physical Geography</div>
+</div>
+
+<div class="status">
+    <span class="status-dot"></span>
+    ระบบพร้อมใช้งาน
+</div>
+
+</div>
+
+</header>
+
+
+<main class="container">
+
+<section class="hero">
+
+<h1>
+ทดลองโลก<br>
+<span>ด้วยตัวคุณเอง</span>
+</h1>
+
+<p>
+ปรับปัจจัยทางภูมิศาสตร์ แล้วดูผลลัพธ์ที่เกิดขึ้น
+เรียนรู้ภูมิศาสตร์กายภาพผ่านการทดลองแบบ Interactive
+</p>
+
+</section>
+
+
+<section class="modes">
+
+<button class="mode active" data-mode="flood">
+
+<div class="mode-icon">🌊</div>
+
+<h3>น้ำท่วม</h3>
+
+<p>
+ทดลองว่าฝน ความลาดชัน และการระบายน้ำ
+ส่งผลต่อการเกิดน้ำท่วมอย่างไร
+</p>
+
+</button>
+
+
+<button class="mode" data-mode="plate">
+
+<div class="mode-icon">🌋</div>
+
+<h3>แผ่นเปลือกโลก</h3>
+
+<p>
+ทดลองการชน การแยก และการเลื่อนผ่าน
+ของแผ่นเปลือกโลก
+</p>
+
+</button>
+
+
+<button class="mode" data-mode="landform">
+
+<div class="mode-icon">🏔️</div>
+
+<h3>การเกิดภูมิประเทศ</h3>
+
+<p>
+ทดลองผลของน้ำ ลม และความแข็งของหิน
+ต่อการเปลี่ยนแปลงภูมิประเทศ
+</p>
+
+</button>
+
+</section>
+
+
+<section class="lab">
+
+<aside class="panel">
+
+<h2 id="controlTitle">
+🌊 ทดลองการเกิดน้ำท่วม
+</h2>
+
+<p class="panel-description" id="controlDescription">
+ปรับตัวแปรแล้วกดเริ่มการจำลอง
+</p>
+
+<div id="controls"></div>
+
+<button class="simulate" id="simulateButton">
+▶ เริ่มการจำลอง
+</button>
+
+<button class="reset" id="resetButton">
+↺ รีเซ็ต
+</button>
+
+</aside>
+
+
+<section class="panel visual">
+
+<div class="visual-header">
+
+<h2>ผลการจำลอง</h2>
+
+<div class="badge" id="badge">
+พร้อมทดลอง
+</div>
+
+</div>
+
+
+<div class="canvas-box">
+<canvas id="geoCanvas"></canvas>
+</div>
+
+
+<div class="result">
+
+<h3 id="resultTitle">
+เริ่มต้นการทดลอง
+</h3>
+
+<p id="resultText">
+เลือกการทดลองทางภูมิศาสตร์
+แล้วกด “เริ่มการจำลอง”
+</p>
+
+
+<div class="facts">
+
+<div class="fact">
+<strong>CONCEPT</strong>
+<span id="fact1">ภูมิศาสตร์กายภาพ</span>
+</div>
+
+<div class="fact">
+<strong>CAUSE</strong>
+<span id="fact2">ปัจจัยทางธรรมชาติ</span>
+</div>
+
+<div class="fact">
+<strong>RESULT</strong>
+<span id="fact3">รอการทดลอง</span>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</section>
+
+
+<div class="footer">
+GeoLab • Interactive Physical Geography Learning
+</div>
+
+</main>
+
+
+<script>
+
+/* =========================================================
+   GEO LAB
+   ========================================================= */
+
+const canvas = document.getElementById("geoCanvas");
+const ctx = canvas.getContext("2d");
+
+let currentMode = "flood";
+let animationFrame = null;
+
+
+/* =========================================================
+   CONFIG
+   ========================================================= */
+
+const modes = {
+
+flood: {
+
+title:"🌊 ทดลองการเกิดน้ำท่วม",
+
+description:
+"ปรับปริมาณฝน ความลาดชัน และประสิทธิภาพการระบายน้ำ",
+
+controls:[
+
+{
+id:"rain",
+label:"ปริมาณฝน",
+min:0,
+max:100,
+value:65,
+unit:"%"
+},
+
+{
+id:"slope",
+label:"ความลาดชัน",
+min:0,
+max:100,
+value:35,
+unit:"%"
+},
+
+{
+id:"drain",
+label:"ประสิทธิภาพการระบายน้ำ",
+min:0,
+max:100,
+value:35,
+unit:"%"
+}
+
+]
+
+},
+
+
+plate: {
+
+title:"🌋 ทดลองแผ่นเปลือกโลก",
+
+description:
+"เลือกประเภทการเคลื่อนที่ของแผ่นเปลือกโลก",
+
+controls:[
+
+{
+id:"movement",
+label:"การเคลื่อนที่",
+type:"select",
+value:"collision",
+
+options:[
+
+["collision","ชนกัน • Convergent"],
+["diverge","แยกออก • Divergent"],
+["transform","เลื่อนผ่านกัน • Transform"]
+
+]
+
+},
+
+{
+id:"speed",
+label:"ความเร็ว",
+min:1,
+max:100,
+value:50,
+unit:"%"
+}
+
+]
+
+},
+
+
+landform: {
+
+title:"🏔️ ทดลองการเกิดภูมิประเทศ",
+
+description:
+"ทดลองผลของน้ำ ลม และความแข็งของหิน",
+
+controls:[
+
+{
+id:"water",
+label:"พลังของน้ำ",
+min:0,
+max:100,
+value:70,
+unit:"%"
+},
+
+{
+id:"wind",
+label:"พลังของลม",
+min:0,
+max:100,
+value:40,
+unit:"%"
+},
+
+{
+id:"rock",
+label:"ความแข็งของหิน",
+min:0,
+max:100,
+value:45,
+unit:"%"
+}
+
+]
+
+}
+
+};
+
+
+/* =========================================================
+   CANVAS RESIZE
+   ========================================================= */
+
+function resizeCanvas(){
+
+const rect = canvas.getBoundingClientRect();
+
+const dpr = window.devicePixelRatio || 1;
+
+canvas.width = Math.max(1,Math.floor(rect.width*dpr));
+canvas.height = Math.max(1,Math.floor(rect.height*dpr));
+
+ctx.setTransform(dpr,0,0,dpr,0,0);
+
+draw();
+
+}
+
+window.addEventListener("resize",resizeCanvas);
+
+
+/* =========================================================
+   GET VALUES
+   ========================================================= */
+
+function value(id){
+
+const element = document.getElementById(id);
+
+if(!element) return 0;
+
+return element.value;
+
+}
+
+
+/* =========================================================
+   CLEAR
+   ========================================================= */
+
+function clear(){
+
+const w = canvas.clientWidth;
+const h = canvas.clientHeight;
+
+ctx.clearRect(0,0,w,h);
+
+const gradient =
+ctx.createLinearGradient(0,0,0,h);
+
+gradient.addColorStop(0,"#091d29");
+gradient.addColorStop(1,"#040d13");
+
+ctx.fillStyle = gradient;
+ctx.fillRect(0,0,w,h);
+
+return {w,h};
+
+}
+
+
+/* =========================================================
+   TEXT
+   ========================================================= */
+
+function text(txt,x,y,size=15){
+
+ctx.save();
+
+ctx.font=`bold ${size}px Arial`;
+
+ctx.fillStyle="white";
+
+ctx.shadowColor="rgba(0,0,0,.7)";
+ctx.shadowBlur=5;
+
+ctx.fillText(txt,x,y);
+
+ctx.restore();
+
+}
+
+
+/* =========================================================
+   DRAW
+   ========================================================= */
+
+function draw(){
+
+if(currentMode==="flood"){
+drawFlood();
+}
+
+if(currentMode==="plate"){
+drawPlate();
+}
+
+if(currentMode==="landform"){
+drawLandform();
+}
+
+}
+
+
+/* =========================================================
+   FLOOD
+   ========================================================= */
+
+function drawFlood(){
+
+const {w,h}=clear();
+
+const rain=Number(value("rain"));
+const slope=Number(value("slope"));
+const drain=Number(value("drain"));
+
+const risk=Math.max(
+0,
+Math.min(
+100,
+rain*.72+
+(100-slope)*.28-
+drain*.45
+)
+);
+
+
+/* ground */
+
+const ground=h*.60;
+
+ctx.fillStyle="#263d2e";
+
+ctx.beginPath();
+
+ctx.moveTo(0,ground);
+
+for(let x=0;x<=w;x+=8){
+
+const y=
+ground+
+Math.sin(x*.012)*18+
+Math.sin(x*.027)*7;
+
+ctx.lineTo(x,y);
+
+}
+
+ctx.lineTo(w,h);
+ctx.lineTo(0,h);
+ctx.closePath();
+
+ctx.fill();
+
+
+/* water */
+
+const waterHeight=
+Math.max(12,risk/100*h*.55);
+
+const waterY=h-waterHeight;
+
+ctx.fillStyle="rgba(49,164,216,.75)";
+
+ctx.beginPath();
+
+ctx.moveTo(0,waterY);
+
+for(let x=0;x<=w;x+=8){
+
+ctx.lineTo(
+x,
+waterY+
+Math.sin(x*.03)*5
+);
+
+}
+
+ctx.lineTo(w,h);
+ctx.lineTo(0,h);
+
+ctx.closePath();
+
+ctx.fill();
+
+
+/* rain */
+
+if(rain>15){
+
+ctx.strokeStyle="rgba(170,225,255,.45)";
+ctx.lineWidth=1;
+
+for(let i=0;i<70;i++){
+
+const x=(i*83)%w;
+const y=(i*47)%(h*.5);
+
+ctx.beginPath();
+
+ctx.moveTo(x,y);
+
+ctx.lineTo(x-3,y+12);
+
+ctx.stroke();
+
+}
+
+}
+
+text(
+`ระดับความเสี่ยง ${Math.round(risk)}%`,
+20,
+35
+);
+
+}
+
+
+/* =========================================================
+   PLATE TECTONICS
+   ========================================================= */
+
+function drawPlate(){
+
+const {w,h}=clear();
+
+const movement=value("movement");
+const speed=Number(value("speed"));
+
+
+const centerY=h*.60;
+
+
+/* background */
+
+ctx.fillStyle="#07141c";
+
+ctx.fillRect(0,0,w,h);
+
+
+/* mantle */
+
+ctx.fillStyle="#482d26";
+
+ctx.fillRect(
+0,
+centerY+h*.25,
+w,
+h*.75
+);
+
+
+/* mantle glow */
+
+const glow=
+ctx.createRadialGradient(
+w/2,
+centerY+h*.45,
+20,
+w/2,
+centerY+h*.45,
+w*.7
+);
+
+glow.addColorStop(0,"rgba(230,100,45,.45)");
+glow.addColorStop(1,"rgba(230,70,30,0)");
+
+ctx.fillStyle=glow;
+
+ctx.fillRect(
+0,
+centerY,
+w,
+h-centerY
+);
+
+
+/* ==============================
+   COLLISION
+   ============================== */
+
+if(movement==="collision"){
+
+const gap=w*.06;
+
+const leftX=0;
+const rightX=w*.52+gap;
+
+drawPlate(
+leftX,
+centerY,
+w*.48,
+h*.25,
+"#756658"
+);
+
+drawPlate(
+rightX,
+centerY,
+w*.48,
+h*.25,
+"#756658"
+);
+
+
+/* mountain */
+
+ctx.fillStyle="#9b876e";
+
+ctx.beginPath();
+
+ctx.moveTo(w*.39,centerY);
+
+ctx.lineTo(w*.46,centerY-h*.30);
+
+ctx.lineTo(w*.50,centerY-h*.16);
+
+ctx.lineTo(w*.55,centerY);
+
+ctx.closePath();
+
+ctx.fill();
+
+
+/* volcano */
+
+ctx.fillStyle="#725c4b";
+
+ctx.beginPath();
+
+ctx.moveTo(w*.49,centerY);
+ctx.lineTo(w*.53,centerY-h*.20);
+ctx.lineTo(w*.57,centerY);
+ctx.closePath();
+
+ctx.fill();
+
+
+/* arrows */
+
+arrow(
+w*.24,
+centerY+h*.20,
+w*.40,
+centerY+h*.20
+);
+
+arrow(
+w*.76,
+centerY+h*.20,
+w*.60,
+centerY+h*.20
+);
+
+
+text(
+"CONVERGENT • ชนกัน",
+20,
+35
+);
+
+text(
+"⛰️ เทือกเขา",
+w*.42,
+centerY-h*.34
+);
+
+text(
+"🌋 ภูเขาไฟ",
+w*.54,
+centerY-h*.23
+);
+
+}
+
+
+/* ==============================
+   DIVERGENT
+   ============================== */
+
+if(movement==="diverge"){
+
+drawPlate(
+0,
+centerY,
+w*.43,
+h*.25,
+"#756658"
+);
+
+drawPlate(
+w*.57,
+centerY,
+w*.43,
+h*.25,
+"#756658"
+);
+
+
+/* magma */
+
+ctx.fillStyle="#d85f38";
+
+ctx.beginPath();
+
+ctx.moveTo(w*.43,centerY+h*.05);
+ctx.lineTo(w*.50,centerY-h*.18);
+ctx.lineTo(w*.57,centerY+h*.05);
+
+ctx.closePath();
+
+ctx.fill();
+
+
+/* arrows */
+
+arrow(
+w*.38,
+centerY+h*.20,
+w*.20,
+centerY+h*.20
+);
+
+arrow(
+w*.62,
+centerY+h*.20,
+w*.80,
+centerY+h*.20
+);
+
+
+text(
+"DIVERGENT • แยกออก",
+20,
+35
+);
+
+text(
+"🔥 แมกมาดันขึ้น",
+w*.40,
+centerY-h*.22
+);
+
+}
+
+
+/* ==============================
+   TRANSFORM
+   ============================== */
+
+if(movement==="transform"){
+
+drawPlate(
+0,
+centerY,
+w*.49,
+h*.25,
+"#756658"
+);
+
+drawPlate(
+w*.51,
+centerY,
+w*.49,
+h*.25,
+"#756658"
+);
+
+
+/* fault */
+
+ctx.strokeStyle="#ff765f";
+ctx.lineWidth=7;
+
+ctx.beginPath();
+
+ctx.moveTo(w*.5,centerY-h*.18);
+
+ctx.lineTo(w*.5,centerY+h*.30);
+
+ctx.stroke();
+
+
+/* arrows */
+
+arrow(
+w*.30,
+centerY+h*.20,
+w*.43,
+centerY+h*.20
+);
+
+arrow(
+w*.70,
+centerY+h*.20,
+w*.57,
+centerY+h*.20
+);
+
+
+text(
+"TRANSFORM • เลื่อนผ่านกัน",
+20,
+35
+);
+
+text(
+"⚡ แนวรอยเลื่อน",
+w*.36,
+centerY-h*.25
+);
+
+}
+
+
+/* speed indicator */
+
+text(
+`ความเร็ว ${speed}%`,
+20,
+h-20
+);
+
+}
+
+
+/* =========================================================
+   PLATE
+   ========================================================= */
+
+function drawPlate(x,y,width,height,color){
+
+ctx.fillStyle=color;
+
+ctx.beginPath();
+
+ctx.moveTo(x,y);
+
+ctx.lineTo(x+width,y-height*.08);
+
+ctx.lineTo(x+width,y+height);
+
+ctx.lineTo(x,y+height-height*.05);
+
+ctx.closePath();
+
+ctx.fill();
+
+
+/* rock texture */
+
+ctx.strokeStyle="rgba(255,255,255,.12)";
+ctx.lineWidth=1;
+
+for(let i=0;i<7;i++){
+
+const px=x+(i+.5)*width/7;
+
+ctx.beginPath();
+
+ctx.moveTo(px,y+15);
+
+ctx.lineTo(
+px-10,
+y+height-10
+);
+
+ctx.stroke();
+
+}
+
+}
+
+
+/* =========================================================
+   ARROW
+   ========================================================= */
+
+function arrow(x1,y1,x2,y2){
+
+ctx.strokeStyle="#55d6a1";
+ctx.fillStyle="#55d6a1";
+ctx.lineWidth=4;
+
+ctx.beginPath();
+
+ctx.moveTo(x1,y1);
+ctx.lineTo(x2,y2);
+
+ctx.stroke();
+
+
+const angle=Math.atan2(
+y2-y1,
+x2-x1
+);
+
+const size=12;
+
+ctx.beginPath();
+
+ctx.moveTo(x2,y2);
+
+ctx.lineTo(
+x2-size*Math.cos(angle-.5),
+y2-size*Math.sin(angle-.5)
+);
+
+ctx.lineTo(
+x2-size*Math.cos(angle+.5),
+y2-size*Math.sin(angle+.5)
+);
+
+ctx.closePath();
+
+ctx.fill();
+
+}
+
+
+/* =========================================================
+   LANDFORM
+   ========================================================= */
+
+function drawLandform(){
+
+const {w,h}=clear();
+
+const water=Number(value("water"));
+const wind=Number(value("wind"));
+const rock=Number(value("rock"));
+
+const erosion=
+(water*.5+wind*.3)*(1-rock/130);
+
+
+/* sky */
+
+const sky=
+ctx.createLinearGradient(0,0,0,h*.65);
+
+sky.addColorStop(0,"#123443");
+sky.addColorStop(1,"#23505b");
+
+ctx.fillStyle=sky;
+
+ctx.fillRect(0,0,w,h);
+
+
+/* mountain */
+
+ctx.fillStyle="#48685c";
+
+ctx.beginPath();
+
+ctx.moveTo(0,h*.66);
+
+for(let x=0;x<=w;x+=8){
+
+const y=
+h*.48+
+Math.sin(x*.009)*70+
+Math.sin(x*.025)*25-
+erosion*.30;
+
+ctx.lineTo(x,y);
+
+}
+
+ctx.lineTo(w,h);
+ctx.lineTo(0,h);
+
+ctx.closePath();
+
+ctx.fill();
+
+
+/* river */
+
+ctx.strokeStyle="#4cb9df";
+
+ctx.lineWidth=12;
+
+ctx.beginPath();
+
+for(let x=0;x<=w;x+=8){
+
+const y=
+h*.64+
+Math.sin(x*.014)*32+
+Math.sin(x*.04)*10;
+
+if(x===0){
+
+ctx.moveTo(x,y);
+
+}else{
+
+ctx.lineTo(x,y);
+
+}
+
+}
+
+ctx.stroke();
+
+
+/* wind */
+
+ctx.strokeStyle="rgba(255,255,255,.25)";
+ctx.lineWidth=1;
+
+for(let i=0;i<30;i++){
+
+const x=(i*97)%w;
+const y=70+(i*43)%(h*.45);
+
+ctx.beginPath();
+
+ctx.moveTo(x,y);
+ctx.lineTo(x+35+wind*.3,y);
+
+ctx.stroke();
+
+}
+
+
+text(
+`ระดับการเปลี่ยนแปลง ${Math.round(erosion)}%`,
+20,
+35
+);
+
+}
+
+
+/* =========================================================
+   CONTROLS
+   ========================================================= */
+
+function renderControls(){
+
+const config=modes[currentMode];
+
+document.getElementById("controlTitle").textContent=
+config.title;
+
+document.getElementById("controlDescription").textContent=
+config.description;
+
+
+const box=document.getElementById("controls");
+
+box.innerHTML="";
+
+
+config.controls.forEach(control=>{
+
+const div=document.createElement("div");
+
+div.className="control";
+
+
+if(control.type==="select"){
+
+div.innerHTML=`
+
+<div class="control-top">
+<span class="control-name">${control.label}</span>
+</div>
+
+<select id="${control.id}">
+
+${control.options.map(option=>`
+
+<option value="${option[0]}">
+${option[1]}
+</option>
+
+`).join("")}
+
+</select>
+
+`;
+
+}else{
+
+div.innerHTML=`
+
+<div class="control-top">
+
+<span class="control-name">
+${control.label}
+</span>
+
+<span class="control-value"
+id="${control.id}Value">
+
+${control.value}${control.unit}
+
+</span>
+
+</div>
+
+<input
+type="range"
+id="${control.id}"
+min="${control.min}"
+max="${control.max}"
+value="${control.value}"
+>
+
+`;
+
+}
+
+box.appendChild(div);
+
+});
+
+
+config.controls.forEach(control=>{
+
+const element=document.getElementById(control.id);
+
+if(!element)return;
+
+
+element.addEventListener("input",()=>{
+
+if(control.type!=="select"){
+
+document.getElementById(
+control.id+"Value"
+).textContent=
+element.value+control.unit;
+
+}
+
+draw();
+
+});
+
+});
+
+
+// select change
+
+const movement=document.getElementById("movement");
+
+if(movement){
+
+movement.addEventListener("change",draw);
+
+}
+
+draw();
+
+}
+
+
+/* =========================================================
+   RESULT
+   ========================================================= */
+
+function showResult(){
+
+const title=document.getElementById("resultTitle");
+const textResult=document.getElementById("resultText");
+const badge=document.getElementById("badge");
+
+if(currentMode==="flood"){
+
+const rain=Number(value("rain"));
+const slope=Number(value("slope"));
+const drain=Number(value("drain"));
+
+const risk=Math.max(
+0,
+Math.min(
+100,
+rain*.72+
+(100-slope)*.28-
+drain*.45
+)
+);
+
+
+if(risk>=70){
+
+badge.textContent="ความเสี่ยงสูง";
+
+title.textContent=
+"🌊 มีโอกาสเกิดน้ำท่วมสูง";
+
+textResult.textContent=
+"ปริมาณฝนที่มากและการระบายน้ำที่ไม่ดี "
++"ทำให้น้ำสะสมบนพื้นผิวมากขึ้น "
++"ขณะที่พื้นที่ลาดชันต่ำจะระบายน้ำออกได้ช้าลง.";
+
+}else if(risk>=40){
+
+badge.textContent="ความเสี่ยงปานกลาง";
+
+title.textContent=
+"💧 มีโอกาสเกิดน้ำท่วมปานกลาง";
+
+textResult.textContent=
+"มีปัจจัยบางอย่างที่เอื้อต่อการสะสมน้ำ "
++"แต่ยังมีปัจจัยช่วยลดความเสี่ยง เช่น "
++"ความลาดชันหรือประสิทธิภาพการระบายน้ำ.";
+
+}else{
+
+badge.textContent="ความเสี่ยงต่ำ";
+
+title.textContent=
+"🌱 ความเสี่ยงน้ำท่วมค่อนข้างต่ำ";
+
+textResult.textContent=
+"พื้นที่มีปัจจัยที่ช่วยให้น้ำระบายออกได้ดี "
++"ทำให้การสะสมของน้ำลดลง.";
+
+}
+
+document.getElementById("fact1").textContent=
+"น้ำท่วม";
+
+document.getElementById("fact2").textContent=
+"ฝน + ภูมิประเทศ + การระบายน้ำ";
+
+document.getElementById("fact3").textContent=
+Math.round(risk)+"%";
+
+}
+
+
+if(currentMode==="plate"){
+
+const movement=value("movement");
+
+badge.textContent="Simulation Complete";
+
+document.getElementById("fact1").textContent=
+"ธรณีแปรสัณฐาน";
+
+document.getElementById("fact2").textContent=
+"การเคลื่อนที่ของแผ่นเปลือกโลก";
+
+
+if(movement==="collision"){
+
+title.textContent=
+"⛰️ แผ่นเปลือกโลกเคลื่อนเข้าหากัน";
+
+textResult.textContent=
+"เมื่อแผ่นเปลือกโลกเคลื่อนเข้าหากัน "
++"อาจเกิดการมุดตัว การก่อตัวของเทือกเขา "
++"ภูเขาไฟ และแผ่นดินไหว "
++"ขึ้นอยู่กับชนิดของแผ่นเปลือกโลก.";
+
+document.getElementById("fact3").textContent=
+"เทือกเขา / ภูเขาไฟ / แผ่นดินไหว";
+
+}
+
+
+if(movement==="diverge"){
+
+title.textContent=
+"🌋 แผ่นเปลือกโลกแยกออกจากกัน";
+
+textResult.textContent=
+"เมื่อแผ่นเปลือกโลกเคลื่อนออกจากกัน "
++"แมกมาจากชั้นเนื้อโลกสามารถเคลื่อนตัวขึ้นมา "
++"และสร้างเปลือกโลกใหม่.";
+
+document.getElementById("fact3").textContent=
+"เปลือกโลกใหม่ / ภูเขาไฟ";
+
+}
+
+
+if(movement==="transform"){
+
+title.textContent=
+"⚡ แผ่นเปลือกโลกเลื่อนผ่านกัน";
+
+textResult.textContent=
+"แผ่นเปลือกโลกเคลื่อนที่สวนทางกันตามแนวรอยเลื่อน "
++"แรงเสียดทานสามารถสะสมความเค้น "
++"และปลดปล่อยพลังงานออกมาเป็นแผ่นดินไหว.";
+
+document.getElementById("fact3").textContent=
+"แผ่นดินไหว";
+
+}
+
+}
+
+
+if(currentMode==="landform"){
+
+const water=Number(value("water"));
+const wind=Number(value("wind"));
+const rock=Number(value("rock"));
+
+const erosion=
+(water*.5+wind*.3)*(1-rock/130);
+
+
+badge.textContent=
+erosion>55
+?"การกัดเซาะสูง"
+:erosion>30
+?"การกัดเซาะปานกลาง"
+:"การกัดเซาะต่ำ";
+
+
+title.textContent=
+"🏔️ ผลของการกัดเซาะ";
+
+textResult.textContent=
+"น้ำและลมเป็นตัวการสำคัญของการกัดเซาะ "
++"การพัดพา และการทับถมของตะกอน "
++"ขณะที่ความแข็งของหินมีผลต่อความเร็ว "
++"ในการเปลี่ยนแปลงภูมิประเทศ.";
+
+document.getElementById("fact1").textContent=
+"การกัดเซาะ";
+
+document.getElementById("fact2").textContent=
+"น้ำ + ลม + ชนิดของหิน";
+
+document.getElementById("fact3").textContent=
+Math.round(erosion)+"%";
+
+}
+
+}
+
+
+/* =========================================================
+   SIMULATION
+   ========================================================= */
+
+function simulate(){
+
+if(animationFrame){
+
+cancelAnimationFrame(animationFrame);
+
+animationFrame=null;
+
+}
+
+const start=performance.now();
+
+function animate(now){
+
+const progress=
+Math.min((now-start)/1200,1);
+
+
+// แสดง animation ตามโหมด
+
+if(currentMode==="flood"){
+
+drawFloodAnimation(progress);
+
+}else{
+
+draw();
+
+}
+
+
+// animation เสร็จ
+
+if(progress<1){
+
+animationFrame=
+requestAnimationFrame(animate);
+
+}else{
+
+animationFrame=null;
+
+showResult();
+
+}
+
+}
+
+animationFrame=
+requestAnimationFrame(animate);
+
+}
+
+
+/* =========================================================
+   FLOOD ANIMATION
+   ========================================================= */
+
+function drawFloodAnimation(progress){
+
+const {w,h}=clear();
+
+const rain=Number(value("rain"));
+const slope=Number(value("slope"));
+const drain=Number(value("drain"));
+
+const risk=Math.max(
+0,
+Math.min(
+100,
+rain*.72+
+(100-slope)*.28-
+drain*.45
+)
+);
+
+const animatedRisk=risk*progress;
+
+const ground=h*.60;
+
+ctx.fillStyle="#263d2e";
+
+ctx.beginPath();
+
+ctx.moveTo(0,ground);
+
+for(let x=0;x<=w;x+=8){
+
+ctx.lineTo(
+x,
+ground+Math.sin(x*.012)*18
+);
+
+}
+
+ctx.lineTo(w,h);
+ctx.lineTo(0,h);
+
+ctx.closePath();
+
+ctx.fill();
+
+
+const waterHeight=
+Math.max(
+10,
+animatedRisk/100*h*.55
+);
+
+const waterY=h-waterHeight;
+
+ctx.fillStyle="rgba(49,164,216,.78)";
+
+ctx.beginPath();
+
+ctx.moveTo(0,waterY);
+
+for(let x=0;x<=w;x+=8){
+
+ctx.lineTo(
+x,
+waterY+Math.sin(x*.03)*5
+);
+
+}
+
+ctx.lineTo(w,h);
+ctx.lineTo(0,h);
+
+ctx.closePath();
+
+ctx.fill();
+
+
+text(
+`ระดับน้ำ ${Math.round(animatedRisk)}%`,
+20,
+35
+);
+
+}
+
+
+/* =========================================================
+   MODE BUTTONS
+   ========================================================= */
+
+document.querySelectorAll(".mode").forEach(button=>{
+
+button.addEventListener("click",()=>{
+
+document.querySelectorAll(".mode")
+.forEach(item=>{
+item.classList.remove("active");
+});
+
+button.classList.add("active");
+
+currentMode=button.dataset.mode;
+
+document.getElementById("badge").textContent=
+"พร้อมทดลอง";
+
+document.getElementById("resultTitle").textContent=
+"เริ่มต้นการทดลอง";
+
+document.getElementById("resultText").textContent=
+"ปรับตัวแปรทางภูมิศาสตร์ แล้วกด “เริ่มการจำลอง”";
+
+renderControls();
+
+});
+
+});
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+document.getElementById("simulateButton")
+.addEventListener("click",simulate);
+
+
+document.getElementById("resetButton")
+.addEventListener("click",()=>{
+
+if(animationFrame){
+
+cancelAnimationFrame(animationFrame);
+
+animationFrame=null;
+
+}
+
+renderControls();
+
+document.getElementById("badge").textContent=
+"พร้อมทดลอง";
+
+document.getElementById("resultTitle").textContent=
+"เริ่มต้นการทดลอง";
+
+document.getElementById("resultText").textContent=
+"ปรับตัวแปรทางภูมิศาสตร์ แล้วกด “เริ่มการจำลอง”";
+
+});
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+renderControls();
+
+requestAnimationFrame(()=>{
+
+resizeCanvas();
+
+});
+
+</script>
+
+</body>
+</html>
